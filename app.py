@@ -22,12 +22,12 @@ def index():
 
 @app.route('/login')
 def login():
-    return render_template('login_from.html')
+    return render_template('login_form.html')
 
 
 @app.route('/login/try', methods=['POST'])
 def login_try():
-    ok = user.try_login(request.from)
+    ok = user.try_login(request.form)
     if not ok:
         return msg('ログインに失敗しました')
     return redirect('/')
@@ -39,7 +39,7 @@ def logout():
     return msg('ログアウトしました')
 
 
-@app.route('/uses/<user_id>')
+@app.route('/users/<user_id>')
 @user.login_required
 def users(user_id):
     if user_id not in user.USER_LOGIN_LIST:
@@ -56,14 +56,14 @@ def users(user_id):
 @user.login_required
 def fav_add(user_id):
     data.add_fav(user.get_id(), user_id)
-    return redirect('/users', + user_id)
+    return redirect('/users/' + user_id)
 
 
 @app.route('/fav/remove/<user_id>')
 @user.login_required
 def remove_fav(user_id):
     data.remove_fav(user.get_id(), user_id)
-    return redirect('/uses/' + user_id)
+    return redirect('/users/' + user_id)
 
 
 @app.route('/write')
@@ -73,7 +73,7 @@ def write():
                            id=user.get_id())
 
 
-@app.route('/write/try')
+@app.route('/write/try', methods=['POST'])
 @user.login_required
 def try_write():
     text = request.form.get('text', '')
@@ -95,7 +95,7 @@ def add_staticfile():
 def staticfile_cp(fname):
     path = os.path.join(app.root_path, 'static', fname)
     mtime = str(int(os.stat(path).st_mtime))
-    return '/static' + fname + '?v=' + str(mtime)
+    return '/static/' + fname + '?v=' + str(mtime)
 
 
 @app.template_filter('linebreak')
